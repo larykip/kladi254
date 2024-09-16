@@ -1,0 +1,17 @@
+export const data = [
+    { id: 1, img: '/images/pizza.jpg', text: 'Pizza', price: '$14' },
+    { id: 2, img: '/images/pancakes.jpg', text: 'Pancakes', price: '$24' },
+    { id: 3, img: '/images/flowers.jpg', text: 'Flowers', price: '$44' },
+    { id: 4, img: '/images/pizza.jpg', text: 'Pizza', price: '$14' },
+    { id: 5, img: '/images/pancakes.jpg', text: 'Pancakes', price: '$24' },
+    { id: 6, img: '/images/flowers.jpg', text: 'Flowers', price: '$44' },
+    { id: 7, img: '/images/pizza.jpg', text: 'Pizza', price: '$14' },
+    { id: 8, img: '/images/pancakes.jpg', text: 'Pancakes', price: '$24' },
+    { id: 9, img: '/images/flowers.jpg', text: 'Flowers', price: '$44' },
+    { id: 10, img: '/images/pizza.jpg', text: 'Pizza', price: '$14' },
+    { id: 11, img: '/images/pancakes.jpg', text: 'Pancakes', price: '$24' },
+    { id: 12, img: '/images/flowers.jpg', text: 'Flowers', price: '$44' },
+    { id: 13, img: '/images/pizza.jpg', text: 'Pizza', price: '$14' },
+    { id: 14, img: '/images/pancakes.jpg', text: 'Pancakes', price: '$24' },
+    { id: 15, img: '/images/flowers.jpg', text: 'Flowers', price: '$44' },
+];
