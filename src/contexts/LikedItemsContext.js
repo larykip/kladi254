@@ -1,57 +1,92 @@
 'use client';
-import React, { createContext, useState, useContext } from 'react';
-import { data } from '@/lib/data';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
-//creates a useContext hook and a Provider component. UseContext have providers and consumers
 const LikedItemsContext = createContext();
 
-//provider component that wraps the children components and provides the context to them
 export const LikedItemsProvider = ({ children }) => {
-    const [clickedStates, setClickedStates] = useState(() => {
-        //initialize an empty object
-        const initialStates = {};
-
-        //loop through the data array and set the initial state of each item to false
-        data.forEach(item => {
-            initialStates[item.id] = false;
-        });
-        return initialStates;
-    });
+    const [clickedStates, setClickedStates] = useState({});
     const [likedItems, setLikedItems] = useState([]);
+    const [userId, setUserId] = useState(null);
 
-    const handleClick = (id) => {
-        //update the state of the clicked item
-        setClickedStates((prevStates) => {
-            //create a new object with the previous states
-            const newStates = { ...prevStates };
-            //toggle the state of the clicked item
-            newStates[id] = !newStates[id];
-    
-            // Find the item in data
-            const item = data.find((item) => item.id === id);
-    
-            // Check if item exists in data
-            if (!item) {
-                console.error(`Item with id ${id} not found in data.`);
-                return prevStates; // Return the previous states without changes
+    //fetch user id
+    useEffect(() => {
+        const fetchUser = async () => {
+            const response = await fetch('/api/auth/session');
+            const result = await response.json();
+            if(result.authenticated) {
+                setUserId(result.user.id);
             }
-    
-            setLikedItems((prevLikedItems) => {
-                if (newStates[id]) {
-                    // Add item if it's not already in likedItems
-                    if(prevLikedItems.find((likedItem) => likedItem.id === item.id)){
-                        return prevLikedItems
-                    } else {
-                        return [...prevLikedItems, item];
-                    }
-                } else {
-                    // Remove item if it's in likedItems
-                    return prevLikedItems.filter((likedItem) => likedItem.id !== item.id);
+        }
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        if(userId){
+            const fetchLikedItems = async () => {
+                // Fetch liked items for the current user
+                const response = await fetch(`/api/saved-items?userId=${userId}`);
+                // Check if the response is successful
+                if (response.ok) {
+                    // Parse the response body as JSON
+                    const items = await response.json();
+                    // Set the liked items state
+                    setLikedItems(items);
+
+                    // Initialize clicked states based on the liked items
+                    const initialStates = {}
+                    // Set the clicked state to true for each liked item
+                    items.forEach((item) => {
+                        initialStates[item._id] = true;
+                    });
+                    setClickedStates(initialStates);
                 }
-            });
-    
-            return newStates;
+            }
+            fetchLikedItems();
+        }
+    }, [userId]);
+
+    const handleClick = async (id, item) => {
+        setClickedStates((prevStates) => ({ ...prevStates, [id]: !prevStates[id] }));
+
+        // Call the appropriate API to add or remove liked items
+        await updateLikedItems(id, item);
+    };
+
+    const updateLikedItems = async (id, item) => {
+        // Check if the user ID is available/authenticated
+        if (!userId) return;
+
+        // Find the item in the liked items
+        //const item = likedItems.find((item) => item._id === id);
+
+        // Check if the item is not found
+        //if(!item) return;
+
+        // Determine the API method based on current state
+        const isLiked = clickedStates[id]; //is a boolean value based on the current state of the item
+        const method = isLiked ? 'DELETE' : 'POST'; //if the item is liked, the method is DELETE, otherwise it is POST
+        const url = '/api/saved-items';
+
+        const response = await fetch(url, {
+            method: method,//method is either DELETE or POST based on above condition
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId, // Required for saving
+                itemId: id, //The ID of the item to be added or removed
+                item: isLiked ? null : item //If the item is being liked (added), it includes the item details; if it's being unliked (removed), this field is set to null.
+            }),
         });
+
+        if (response.ok) {
+            // Optionally refresh liked items after modification
+            const updatedLikedItems = await fetch(`/api/saved-items?userId=${userId}`);
+            const items = await updatedLikedItems.json();
+            setLikedItems(items);
+        } else {
+            console.error('Failed to update liked items.');
+        }
     };
 
     return (

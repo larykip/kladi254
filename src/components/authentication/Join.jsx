@@ -8,6 +8,7 @@ const Join = () => {
   const router = useRouter();
 
   const handleSubmit = async (e) => {
+    //prevents form submission/loading a new page
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);

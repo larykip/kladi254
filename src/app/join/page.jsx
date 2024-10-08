@@ -1,4 +1,4 @@
-import Join from '@/components/Join'
+import Join from '@/components/authentication/Join'
 import React from 'react'
 
 const page = () => {

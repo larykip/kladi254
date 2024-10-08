@@ -1,5 +1,5 @@
 import Navbar from '@/components/Navbar'
-import SavedItemsComponent from '@/components/SavedItemsComponent'
+import SavedItemsComponent from '@/components/saved components/SavedItemsComponent'
 import React from 'react'
 
 const SavedItems = () => {
